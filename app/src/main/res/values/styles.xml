@@ -1,11 +1,15 @@
 <resources>
 
-    <style name="MyTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 
-        <item name="colorPrimary">@color/amber</item>
-        <item name="colorAccent">@color/amber</item>
-        <item name="colorPrimaryDark">@color/amberDark</item>
-
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="MatCheckBox" parent="Material.Drawable.CheckBox">
@@ -13,5 +17,4 @@
         <item name="cbd_strokeColor">@color/amber</item>
 
     </style>
-
 </resources>

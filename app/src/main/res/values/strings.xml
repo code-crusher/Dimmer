@@ -4,5 +4,8 @@
     <string name="app_name">Dimmer - Night Eyes Protector</string>
     <string name="banner_ad_unit_id">ca-app-pub-6114196433176882/3690444650</string>
     <string name="info">Dimmer reduces your screen brightness lower than your devices minimum so that you can easily use your device at night and protect your eyes.</string>
+    <string name="groupTickCross" />
+    <string name="cross">cross</string>
+    <string name="tick">tick</string>
 
 </resources>

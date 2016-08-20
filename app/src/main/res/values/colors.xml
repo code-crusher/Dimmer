@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+
+    <color name="colorPrimary">@color/custom_red</color>
+    <color name="colorPrimaryDark">@color/custom_red_dark</color>
+    <color name="colorAccent">@color/custom_red</color>
+
+    <color name="custom_red">#cf4b4b</color>
+    <color name="custom_red_dark">#cf3b3b</color>
+
     <color name="amber">#15b5ad</color>
     <color name="amberDark">@color/dark</color>
     <color name="mdtp_accent_color">#FF9800</color>

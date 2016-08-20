@@ -427,7 +427,6 @@
         android:layout_height="64dp"
         android:layout_gravity="right|bottom"
         android:layout_margin="15dp"
-        android:background="@drawable/fab"
         android:elevation="5dp"
         android:src="@drawable/ic_action_social_share" />
 

@@ -21,10 +21,12 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:design:24.0.0'
     compile 'com.android.support:appcompat-v7:24.0.0'
-    compile 'com.github.rey5137:material:1.1.1'
+    compile 'com.android.support:cardview-v7:24.0.0'
     compile 'com.google.android.gms:play-services-ads:9.2.1'
-    compile'com.android.support:cardview-v7:24.0.0'
+
+    compile 'com.github.rey5137:material:1.1.1'
     compile 'com.wdullaer:materialdatetimepicker:1.4.2'
     compile 'org.greenrobot:eventbus:3.0.0'
 
