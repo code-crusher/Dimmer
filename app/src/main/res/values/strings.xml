@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Dimmer - Night Eyes Protector</string>
+    <string name="app_name">Dimmer - Eyes Protector</string>
     <string name="banner_ad_unit_id">ca-app-pub-6114196433176882/3690444650</string>
     <string name="info">Dimmer reduces your screen brightness lower than your devices minimum so that you can easily use your device at night and protect your eyes.</string>
     <string name="groupTickCross" />
     <string name="cross">cross</string>
     <string name="tick">tick</string>
+    <string name="rate">rate</string>
+    <string name="adjust_dimmer_strength">Adjust dimmer strength</string>
+    <string name="notification_control">Notification Control</string>
+    <string name="auto_start">Auto start</string>
+    <string name="start_time">Start time:</string>
+    <string name="end_time">End time:</string>
+    <string name="_22_00">22:00</string>
+    <string name="_07_00">07:00</string>
+    <string name="edit_end_time">edit end time</string>
+    <string name="edit_start_time">edit start time</string>
 
 </resources>

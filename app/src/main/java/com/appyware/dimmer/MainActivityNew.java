@@ -1,7 +1,10 @@
 package com.appyware.dimmer;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,7 +28,7 @@ public class MainActivityNew extends AppCompatActivity {
     FloatingActionButton fab;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fab = (FloatingActionButton) findViewById(R.id.fab_check);
@@ -50,10 +53,20 @@ public class MainActivityNew extends AppCompatActivity {
         }
     }
 
-    public void animate(View view) {
+    private void animate(View view) {
         Drawable drawable = ((FloatingActionButton) view).getDrawable();
         if (drawable instanceof Animatable) {
             ((Animatable) drawable).start();
+        }
+    }
+
+    public void rate(View view) {
+        Uri uri = Uri.parse("market://details?id=" + getApplicationContext().getPackageName());
+        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+        try {
+            startActivity(goToMarket);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
         }
     }
 }
