@@ -2,6 +2,7 @@
 
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -48,13 +49,12 @@
                         android:id="@+id/seekBar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
+                        android:maxHeight="3dp"
                         android:paddingBottom="5dp"
-                        android:paddingLeft="20dp"
-                        android:paddingRight="20dp"
                         android:paddingTop="5dp"
-                        android:progressTint="@color/amber"
-                        android:thumb="@drawable/abc_switch_thumb_material" />
+                        android:progress="50"
+                        android:progressDrawable="@drawable/seek_progress"
+                        android:thumb="@drawable/seek_thumb" />
 
                 </LinearLayout>
 
@@ -86,7 +86,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1px"
                     android:layout_margin="8dp"
-                    android:background="#cccccc" />
+                    android:background="#a6a6a6" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -226,9 +226,11 @@
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:clickable="true"
+        android:scaleType="centerCrop"
         android:visibility="visible"
         ads:backgroundTint="@color/colorPrimary"
         ads:layout_anchor="@id/cv_main"
-        ads:layout_anchorGravity="center_horizontal|bottom" />
+        ads:layout_anchorGravity="center_horizontal|bottom"
+        tools:context=".MainActivityNew" />
 
 </android.support.design.widget.CoordinatorLayout>

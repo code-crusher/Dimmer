@@ -161,12 +161,12 @@ public class ScreenDimmer extends Service {
 
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(getApplicationContext()).setOngoing(true)
-                            .setSmallIcon(R.drawable.ic_launcher)
+                            .setSmallIcon(R.mipmap.ic_launcher)
                             .setContentTitle("Dimmer running")
                             .setContentText("Tap to stop!")
                             .setContentIntent(pIntent)
-                            .addAction(R.drawable.ic_av_play_arrow, "Pause", pIntentPause)
-                            .addAction(R.drawable.ic_av_pause, "Start", pIntentStart)
+                            // .addAction(R.drawable.ic_av_play_arrow, "Pause", pIntentPause)
+                            // .addAction(R.drawable.ic_av_pause, "Start", pIntentStart)
                             .setAutoCancel(true);
 
 
@@ -207,7 +207,7 @@ public class ScreenDimmer extends Service {
 
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(getApplicationContext()).setOngoing(true)
-                                        .setSmallIcon(R.drawable.ic_launcher)
+                                        .setSmallIcon(R.mipmap.ic_launcher)
                                         .setContentTitle("Dimmer running")
                                         .setContentText("Tap to stop!")
                                         .setContentIntent(pIntent)
