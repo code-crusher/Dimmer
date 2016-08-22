@@ -35,4 +35,5 @@ dependencies {
     compile 'com.wdullaer:materialdatetimepicker:1.4.2'
     compile 'org.greenrobot:eventbus:3.0.0'
 
+    compile 'com.jakewharton:butterknife:8.2.1'
 }

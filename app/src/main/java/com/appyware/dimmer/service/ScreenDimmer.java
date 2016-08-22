@@ -1,4 +1,4 @@
-package com.appyware.dimmer;
+package com.appyware.dimmer.service;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,6 +16,9 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
+
+import com.appyware.dimmer.MainActivity;
+import com.appyware.dimmer.R;
 
 /**
  * Created by appyware on 10/07/15.

@@ -25,7 +25,7 @@
         </activity>
 
         <service
-            android:name=".ScreenDimmer"
+            android:name=".service.ScreenDimmer"
             android:label="My Service" />
 
         <activity
