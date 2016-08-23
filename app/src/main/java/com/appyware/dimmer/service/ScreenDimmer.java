@@ -1,5 +1,6 @@
 package com.appyware.dimmer.service;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -13,6 +14,7 @@ import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import com.appyware.dimmer.MainActivity;
 import com.appyware.dimmer.R;
 import com.appyware.dimmer.helper.Constants;
 import com.appyware.dimmer.helper.SuperPrefs;
@@ -65,7 +67,7 @@ public class ScreenDimmer extends Service implements Constants {
 
             } else if (intent.getAction().equals("START")) {
 
-                int p = superPrefs.getInt(KEY_DIM_VALUE, 0) + 10;
+                int p = superPrefs.getInt(KEY_DIM_VALUE, 0);
 
                 if (mView != null)
                     mView.setBackgroundColor(getColorInt(p));
@@ -98,8 +100,8 @@ public class ScreenDimmer extends Service implements Constants {
         mView_bg.setBackgroundColor(Color.parseColor("#99000000"));
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.FILL_PARENT,
-                WindowManager.LayoutParams.FILL_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 PixelFormat.TRANSLUCENT);
@@ -110,7 +112,7 @@ public class ScreenDimmer extends Service implements Constants {
         wm.addView(mView_bg, params);
         wm.addView(mView, params);
 
-        int p = superPrefs.getInt(KEY_DIM_VALUE, 0) + 10;
+        int p = superPrefs.getInt(KEY_DIM_VALUE, 0);
 
         if (mView != null)
             mView.setBackgroundColor(getColorInt(p));
@@ -128,26 +130,32 @@ public class ScreenDimmer extends Service implements Constants {
 
     private void fireNotification() {
 
-        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
-        intent.setAction("STOP");
-        PendingIntent pIntent = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
+        Context context = getApplicationContext();
 
-        Intent intent1 = new Intent(getApplicationContext(), ScreenDimmer.class);
-        intent1.setAction("PAUSE");
-        PendingIntent pIntentPause = PendingIntent.getService(getApplicationContext(), 0, intent1, 0);
+        Intent intentActivity = new Intent(context, MainActivity.class);
+        PendingIntent pIntentActivity = PendingIntent.getActivity(context, 0, intentActivity, 0);
 
-        Intent intent2 = new Intent(getApplicationContext(), ScreenDimmer.class);
-        intent2.setAction("START");
-        PendingIntent pIntentStart = PendingIntent.getService(getApplicationContext(), 0, intent2, 0);
+        Intent intentStop = new Intent(context, ScreenDimmer.class);
+        intentStop.setAction("STOP");
+        PendingIntent pIntentStop = PendingIntent.getService(context, 0, intentStop, 0);
+
+        Intent intentPause = new Intent(context, ScreenDimmer.class);
+        intentPause.setAction("PAUSE");
+        PendingIntent pIntentPause = PendingIntent.getService(context, 0, intentPause, 0);
+
+        Intent intentStart = new Intent(context, ScreenDimmer.class);
+        intentStart.setAction("START");
+        PendingIntent pIntentStart = PendingIntent.getService(context, 0, intentStart, 0);
 
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(getApplicationContext()).setOngoing(true)
+                new NotificationCompat.Builder(context).setOngoing(true)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle("Dimmer running")
                         .setContentText("Tap to stop!")
-                        .setContentIntent(pIntent)
-                        .addAction(android.R.drawable.ic_media_pause, "Pause", pIntentPause)
-                        .addAction(android.R.drawable.ic_media_play, "Start", pIntentStart)
+                        .setContentIntent(pIntentActivity)
+                        .addAction(R.drawable.ic_pause, "Pause", pIntentPause)
+                        .addAction(R.drawable.ic_stop, "Stop", pIntentStop)
+                        .addAction(R.drawable.ic_play_arrow, "Start", pIntentStart)
                         .setAutoCancel(true);
 
 
@@ -156,8 +164,13 @@ public class ScreenDimmer extends Service implements Constants {
         mNotificationManager.notify(2, mBuilder.build());
     }
 
+    @SuppressLint("DefaultLocale")
+    public String dateFormat(int time) {
+        return String.format("%02d", time);
+    }
+
     private int getColorInt(int value) {
-        return Color.parseColor("#" + value + "000000");
+        return Color.parseColor("#" + dateFormat(value) + "000000");
     }
 
     @Override

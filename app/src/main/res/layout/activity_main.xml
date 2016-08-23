@@ -70,9 +70,11 @@
                     android:id="@+id/seekBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
                     android:maxHeight="4dp"
                     android:paddingBottom="@dimen/dist_medium"
                     android:paddingTop="@dimen/dist_medium"
+                    android:progress="0"
                     android:progressDrawable="@drawable/seek_progress"
                     android:thumb="@drawable/seek_thumb" />
 

@@ -12,12 +12,6 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="MatCheckBox" parent="Material.Drawable.CheckBox">
-
-        <item name="cbd_strokeColor">@color/amber</item>
-
-    </style>
-
     <style name="Theme.Transparent" parent="Theme.AppCompat.Dialog.MinWidth">
         <item name="android:windowIsTranslucent">true</item>
         <item name="windowActionBar">false</item>

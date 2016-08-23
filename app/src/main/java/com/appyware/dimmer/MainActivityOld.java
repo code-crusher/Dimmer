@@ -1,28 +1,8 @@
 package com.appyware.dimmer;
 
-import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
-import android.widget.LinearLayout;
-import android.widget.SeekBar;
-import android.widget.TextView;
-
-import com.rey.material.widget.CheckBox;
 
 public class MainActivityOld extends AppCompatActivity {
-
-    static {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-    }
-
-    public CheckBox checkBox_start, checkBox_noti, checkBox_auto;
-    public SeekBar seekBar;
-    SharedPreferences preferences;
-    LinearLayout infotext;
-    TextView startTime, endTime;
-    int i = 0, noti, auto, flag;
-    int sh, sm, eh, em;
-    android.support.v7.widget.AppCompatImageButton fab;
 //
 //    @Override
 //    public void onCreate(Bundle savedInstanceState) {
