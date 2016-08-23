@@ -33,8 +33,10 @@ public class SuperPrefs implements Constants {
         editor.apply();
     }
 
-    public int getInt(String KEY) {
-        return sharedPreferences.getInt(KEY, 0);
+    public int getInt(String KEY, int defaultValue) {
+        if (sharedPreferences.getInt(KEY, -1) == -1)
+            return defaultValue;
+        return sharedPreferences.getInt(KEY, -1);
     }
 
     public void setBool(String KEY, Boolean value) {
@@ -43,7 +45,13 @@ public class SuperPrefs implements Constants {
         editor.apply();
     }
 
+    public void setBoolNot(String KEY) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(KEY, !sharedPreferences.getBoolean(KEY, false));
+        editor.apply();
+    }
+
     public Boolean getBool(String KEY) {
-        return sharedPreferences.getBoolean(KEY, true);
+        return sharedPreferences.getBoolean(KEY, false);
     }
 }

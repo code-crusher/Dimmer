@@ -11,15 +11,15 @@ import com.google.android.gms.ads.AdView;
 import com.rey.material.widget.CheckBox;
 
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
     private AdView adView;
-    public static CheckBox checkBox_start, checkBox_noti, checkBox_auto;
-    public static SeekBar seekBar;
+    public CheckBox checkBox_start, checkBox_noti, checkBox_auto;
+    public SeekBar seekBar;
     SharedPreferences preferences;
     LinearLayout infotext;
     TextView startTime, endTime;

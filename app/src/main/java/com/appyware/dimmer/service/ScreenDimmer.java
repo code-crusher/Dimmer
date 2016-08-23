@@ -5,84 +5,75 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.CompoundButton;
-import android.widget.SeekBar;
 
-import com.appyware.dimmer.MainActivity;
 import com.appyware.dimmer.R;
+import com.appyware.dimmer.helper.Constants;
+import com.appyware.dimmer.helper.SuperPrefs;
+import com.appyware.dimmer.models.ActivityEvent;
+import com.appyware.dimmer.models.ServiceEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 /**
  * Created by appyware on 10/07/15.
  */
-public class ScreenDimmer extends Service {
+public class ScreenDimmer extends Service implements Constants {
 
     HUDView mView, mView_bg;
-    String bright;
-    SharedPreferences preferences;
     NotificationManager mNotificationManager;
+    SuperPrefs superPrefs;
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    @Subscribe
+    public void OnActivityEvent(ActivityEvent event) {
+        if (mView != null)
+            mView.setBackgroundColor(Color.parseColor("#" + event.dimValue + "000000"));
+        setupNotification();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null) {
-            if (intent.getAction() != null) {
-                if (intent.getAction().equals("STOP")) {
-                    stopService(new Intent(getApplicationContext(), ScreenDimmer.class));
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putInt("tick", 0);
-                    editor.commit();
+        if (intent != null && intent.getAction() != null) {
+            if (intent.getAction().equals("STOP")) {
 
-                    if (mNotificationManager != null) {
-                        mNotificationManager.cancelAll();
-                    }
+                superPrefs.setBool(KEY_DIM, false);
+                EventBus.getDefault().post(new ServiceEvent(EVENT_SERVICE));
 
-                    if (MainActivity.checkBox_start != null)
-                        MainActivity.checkBox_start.setChecked(false);
-                } else if (intent.getAction().equals("PAUSE")) {
-
-                    if (mView_bg != null) {
-                        mView_bg.setBackgroundColor(Color.TRANSPARENT);
-                    }
-                    if (mView != null)
-                        mView.setBackgroundColor(Color.TRANSPARENT);
-
-                } else if (intent.getAction().equals("START")) {
-
-                    preferences = PreferenceManager.getDefaultSharedPreferences(this);
-                    int p = preferences.getInt("slider", 0);
-                    p = p + 10;
-                    if (mView != null)
-                        mView.setBackgroundColor(Color.parseColor("#" + p + "000000"));
-
-                    if (mView_bg != null) {
-                        mView_bg.setBackgroundColor(Color.parseColor("#99000000"));
-                    }
-
+                if (mNotificationManager != null) {
+                    mNotificationManager.cancelAll();
                 }
+                stopService(new Intent(getApplicationContext(), ScreenDimmer.class));
 
+            } else if (intent.getAction().equals("PAUSE")) {
+
+                if (mView_bg != null) {
+                    mView_bg.setBackgroundColor(Color.TRANSPARENT);
+                }
+                if (mView != null)
+                    mView.setBackgroundColor(Color.TRANSPARENT);
+
+            } else if (intent.getAction().equals("START")) {
+
+                int p = superPrefs.getInt(KEY_DIM_VALUE, 0) + 10;
+
+                if (mView != null)
+                    mView.setBackgroundColor(Color.parseColor("#" + p + "000000"));
+
+                if (mView_bg != null) {
+                    mView_bg.setBackgroundColor(Color.parseColor("#99000000"));
+                }
             }
 
         } else {
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt("tick", 1);
-            editor.commit();
-
-            if (MainActivity.checkBox_start != null)
-                MainActivity.checkBox_start.setChecked(false);
-
+            superPrefs.setBool(KEY_DIM, true);
+            EventBus.getDefault().post(new ServiceEvent(EVENT_SERVICE));
         }
 
         return START_STICKY;
@@ -91,12 +82,16 @@ public class ScreenDimmer extends Service {
 
     public void onCreate() {
         super.onCreate();
+
+        superPrefs = new SuperPrefs(getApplicationContext());
+
+        // EventBus
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
+
         mView = new HUDView(this);
         mView_bg = new HUDView(this);
         mView_bg.setBackgroundColor(Color.parseColor("#99000000"));
-
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        bright = preferences.getString("bright", "null");
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.FILL_PARENT,
@@ -111,136 +106,115 @@ public class ScreenDimmer extends Service {
         wm.addView(mView_bg, params);
         wm.addView(mView, params);
 
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int p = preferences.getInt("slider", 0);
-        p = p + 10;
+        int p = superPrefs.getInt(KEY_DIM_VALUE, 0) + 10;
+
         if (mView != null)
             mView.setBackgroundColor(Color.parseColor("#" + p + "000000"));
 
-        if (MainActivity.seekBar != null) {
-            MainActivity.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//        if (MainActivity.seekBar != null) {
+//            MainActivity.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//                @Override
+//                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//
+//                    superPrefs.setInt(KEY_DIM_VALUE, progress);
+//                    progress = 10 + progress;
+//
+//                    if (mView != null)
+//                        mView.setBackgroundColor(Color.parseColor("#" + progress + "000000"));
+//
+//                }
+//
+//                @Override
+//                public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//                }
+//
+//                @Override
+//                public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//                }
+//            });
+        // }
 
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putInt("slider", progress);
-                    editor.commit();
+        setupNotification();
 
-                    progress = 10 + progress;
-
-                    if (mView != null)
-                        mView.setBackgroundColor(Color.parseColor("#" + progress + "000000"));
-
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
-        }
-
-        int noti = preferences.getInt("tickNotification", 1);
-
-        if (noti == 1) {
-
-            Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
-            intent.setAction("STOP");
-            PendingIntent pIntent = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
-
-            Intent intent1 = new Intent(getApplicationContext(), ScreenDimmer.class);
-            intent1.setAction("PAUSE");
-            PendingIntent pIntentPause = PendingIntent.getService(getApplicationContext(), 0, intent1, 0);
-
-            Intent intent2 = new Intent(getApplicationContext(), ScreenDimmer.class);
-            intent2.setAction("START");
-            PendingIntent pIntentStart = PendingIntent.getService(getApplicationContext(), 0, intent2, 0);
+        //final int i = preferences.getInt("tick", -1);
 
 
-            NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(getApplicationContext()).setOngoing(true)
-                            .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentTitle("Dimmer running")
-                            .setContentText("Tap to stop!")
-                            .setContentIntent(pIntent)
-                            // .addAction(R.drawable.ic_av_play_arrow, "Pause", pIntentPause)
-                            // .addAction(R.drawable.ic_av_pause, "Start", pIntentStart)
-                            .setAutoCancel(true);
+        // if (MainActivity.checkBox_noti != null)
 
+//        {
+//            MainActivity.checkBox_noti.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//                @Override
+//                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                    if (isChecked && i == 1) {
+//
+//                        superPrefs.setBool(KEY_NOTI, true);
+//
+//                        fireNotification();
+//
+//                    } else {
+//
+//                        superPrefs.setBool(KEY_NOTI, false);
+//
+//                        if (mNotificationManager != null)
+//                            mNotificationManager.cancelAll();
+//                    }
+//                }
+//            });
+//
+//        }
 
-            mNotificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(2, mBuilder.build());
+    }
 
-        }
-        if (noti == 0 && mNotificationManager != null) {
+    private void setupNotification() {
+        if (superPrefs.getBool(KEY_NOTI))
+            fireNotification();
+
+        if (!superPrefs.getBool(KEY_NOTI) && mNotificationManager != null)
             mNotificationManager.cancelAll();
-        }
+    }
 
-        final int i = preferences.getInt("tick", -1);
+    private void fireNotification() {
 
+        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
+        intent.setAction("STOP");
+        PendingIntent pIntent = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
 
-        if (MainActivity.checkBox_noti != null) {
-            MainActivity.checkBox_noti.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked && i == 1) {
+        Intent intent1 = new Intent(getApplicationContext(), ScreenDimmer.class);
+        intent1.setAction("PAUSE");
+        PendingIntent pIntentPause = PendingIntent.getService(getApplicationContext(), 0, intent1, 0);
 
-                        SharedPreferences.Editor editor = preferences.edit();
-                        editor.putInt("tickNotification", 1);
-                        editor.commit();
-
-                        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
-                        intent.setAction("STOP");
-                        PendingIntent pIntent = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
-
-                        Intent intent1 = new Intent(getApplicationContext(), ScreenDimmer.class);
-                        intent1.setAction("PAUSE");
-                        PendingIntent pIntentPause = PendingIntent.getService(getApplicationContext(), 0, intent1, 0);
-
-                        Intent intent2 = new Intent(getApplicationContext(), ScreenDimmer.class);
-                        intent2.setAction("START");
-                        PendingIntent pIntentStart = PendingIntent.getService(getApplicationContext(), 0, intent2, 0);
+        Intent intent2 = new Intent(getApplicationContext(), ScreenDimmer.class);
+        intent2.setAction("START");
+        PendingIntent pIntentStart = PendingIntent.getService(getApplicationContext(), 0, intent2, 0);
 
 
-                        NotificationCompat.Builder mBuilder =
-                                new NotificationCompat.Builder(getApplicationContext()).setOngoing(true)
-                                        .setSmallIcon(R.mipmap.ic_launcher)
-                                        .setContentTitle("Dimmer running")
-                                        .setContentText("Tap to stop!")
-                                        .setContentIntent(pIntent)
-                                        .addAction(android.R.drawable.ic_media_pause, "Pause", pIntentPause)
-                                        .addAction(android.R.drawable.ic_media_play, "Start", pIntentStart)
-                                        .setAutoCancel(true);
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(getApplicationContext()).setOngoing(true)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Dimmer running")
+                        .setContentText("Tap to stop!")
+                        .setContentIntent(pIntent)
+                        .addAction(android.R.drawable.ic_media_pause, "Pause", pIntentPause)
+                        .addAction(android.R.drawable.ic_media_play, "Start", pIntentStart)
+                        .setAutoCancel(true);
 
 
-                        mNotificationManager =
-                                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                        mNotificationManager.notify(2, mBuilder.build());
+        mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(2, mBuilder.build());
+    }
 
-                    } else {
-
-                        SharedPreferences.Editor editor = preferences.edit();
-                        editor.putInt("tickNotification", 0);
-                        editor.commit();
-
-                        mNotificationManager.cancelAll();
-                    }
-                }
-            });
-
-        }
-
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        EventBus.getDefault().unregister(this);
         if (mView != null && mView_bg != null) {
             ((WindowManager) getSystemService(WINDOW_SERVICE)).removeView(mView);
             ((WindowManager) getSystemService(WINDOW_SERVICE)).removeView(mView_bg);
@@ -259,7 +233,6 @@ public class ScreenDimmer extends Service {
 
         public HUDView(Context context) {
             super(context);
-
             setBackgroundColor(Color.parseColor("#10000000"));
         }
 
