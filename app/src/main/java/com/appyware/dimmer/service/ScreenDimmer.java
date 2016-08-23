@@ -23,8 +23,12 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 /**
- * Created by appyware on 10/07/15.
+ * Created by
+ * --Vatsal Bajpai on
+ * --21/08/16 at
+ * --2:33 PM
  */
+
 public class ScreenDimmer extends Service implements Constants {
 
     HUDView mView, mView_bg;
@@ -34,7 +38,7 @@ public class ScreenDimmer extends Service implements Constants {
     @Subscribe
     public void OnActivityEvent(ActivityEvent event) {
         if (mView != null)
-            mView.setBackgroundColor(Color.parseColor("#" + event.dimValue + "000000"));
+            mView.setBackgroundColor(getColorInt(event.dimValue));
         setupNotification();
     }
 
@@ -64,7 +68,7 @@ public class ScreenDimmer extends Service implements Constants {
                 int p = superPrefs.getInt(KEY_DIM_VALUE, 0) + 10;
 
                 if (mView != null)
-                    mView.setBackgroundColor(Color.parseColor("#" + p + "000000"));
+                    mView.setBackgroundColor(getColorInt(p));
 
                 if (mView_bg != null) {
                     mView_bg.setBackgroundColor(Color.parseColor("#99000000"));
@@ -109,62 +113,9 @@ public class ScreenDimmer extends Service implements Constants {
         int p = superPrefs.getInt(KEY_DIM_VALUE, 0) + 10;
 
         if (mView != null)
-            mView.setBackgroundColor(Color.parseColor("#" + p + "000000"));
-
-//        if (MainActivity.seekBar != null) {
-//            MainActivity.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//                @Override
-//                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//
-//                    superPrefs.setInt(KEY_DIM_VALUE, progress);
-//                    progress = 10 + progress;
-//
-//                    if (mView != null)
-//                        mView.setBackgroundColor(Color.parseColor("#" + progress + "000000"));
-//
-//                }
-//
-//                @Override
-//                public void onStartTrackingTouch(SeekBar seekBar) {
-//
-//                }
-//
-//                @Override
-//                public void onStopTrackingTouch(SeekBar seekBar) {
-//
-//                }
-//            });
-        // }
+            mView.setBackgroundColor(getColorInt(p));
 
         setupNotification();
-
-        //final int i = preferences.getInt("tick", -1);
-
-
-        // if (MainActivity.checkBox_noti != null)
-
-//        {
-//            MainActivity.checkBox_noti.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//                @Override
-//                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                    if (isChecked && i == 1) {
-//
-//                        superPrefs.setBool(KEY_NOTI, true);
-//
-//                        fireNotification();
-//
-//                    } else {
-//
-//                        superPrefs.setBool(KEY_NOTI, false);
-//
-//                        if (mNotificationManager != null)
-//                            mNotificationManager.cancelAll();
-//                    }
-//                }
-//            });
-//
-//        }
-
     }
 
     private void setupNotification() {
@@ -189,7 +140,6 @@ public class ScreenDimmer extends Service implements Constants {
         intent2.setAction("START");
         PendingIntent pIntentStart = PendingIntent.getService(getApplicationContext(), 0, intent2, 0);
 
-
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(getApplicationContext()).setOngoing(true)
                         .setSmallIcon(R.mipmap.ic_launcher)
@@ -204,6 +154,10 @@ public class ScreenDimmer extends Service implements Constants {
         mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(2, mBuilder.build());
+    }
+
+    private int getColorInt(int value) {
+        return Color.parseColor("#" + value + "000000");
     }
 
     @Override
@@ -225,7 +179,6 @@ public class ScreenDimmer extends Service implements Constants {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        // stopService(new Intent(getApplicationContext(), ScreenDimmer.class));
         super.onTaskRemoved(rootIntent);
     }
 
