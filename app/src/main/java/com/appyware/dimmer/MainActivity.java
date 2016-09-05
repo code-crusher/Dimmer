@@ -2,10 +2,7 @@ package com.appyware.dimmer;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Animatable;
@@ -22,11 +19,11 @@ import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.appyware.dimmer.helper.AlarmHelper;
 import com.appyware.dimmer.helper.Constants;
 import com.appyware.dimmer.helper.PermissionChecker;
 import com.appyware.dimmer.helper.SuperPrefs;
@@ -40,7 +37,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -70,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
     FloatingActionButton fabDim;
     private SuperPrefs superPrefs;
     private TimePickerDialog timePickerDialog;
+    private AlarmHelper alarmHelper;
 
     @Subscribe
     public void OnServiceEvent(ServiceEvent event) {
@@ -92,7 +89,8 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
     }
 
     private void init() {
-        superPrefs = new SuperPrefs(this);
+        superPrefs = SuperPrefs.newInstance(this);
+        alarmHelper = new AlarmHelper(this);
         permissionCheck(this);
         setupCheckBoxes();
         setupFab(this);
@@ -246,11 +244,11 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
             case R.id.cb_auto:
                 onCheckClick(KEY_AUTO);
                 if (superPrefs.getBool(KEY_AUTO)) {
-                    cancel();
-                    startAlarm();
-                    stopAlarm();
+                    alarmHelper.cancel();
+                    alarmHelper.startAlarm(superPrefs.getInt(KEY_START_HOUR, 22), superPrefs.getInt(KEY_START_MIN, 0));
+                    alarmHelper.stopAlarm(superPrefs.getInt(KEY_STOP_HOUR, 6), superPrefs.getInt(KEY_STOP_MIN, 0));
                 } else
-                    cancel();
+                    alarmHelper.cancel();
                 break;
         }
     }
@@ -301,63 +299,13 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
             superPrefs.setInt(KEY_STOP_MIN, minute);
         }
         if (superPrefs.getBool(KEY_AUTO)) {
-            cancel();
-            startAlarm();
-            stopAlarm();
+            alarmHelper.cancel();
+            alarmHelper.startAlarm(superPrefs.getInt(KEY_START_HOUR, 22), superPrefs.getInt(KEY_START_MIN, 0));
+            alarmHelper.stopAlarm(superPrefs.getInt(KEY_STOP_HOUR, 6), superPrefs.getInt(KEY_STOP_MIN, 0));
         }
         setupTime();
     }
 
-    private void startAlarm() {
-
-        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        long interval = TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS);
-
-        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
-        PendingIntent pIntent = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
-
-        /* Set the alarm to start at TimePicker time */
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, superPrefs.getInt(KEY_START_HOUR, 22));
-        calendar.set(Calendar.MINUTE, superPrefs.getInt(KEY_START_MIN, 0));
-
-        /* Repeating on everyday */
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                interval, pIntent);
-        Log.d("alarm", "started");
-    }
-
-    private void stopAlarm() {
-
-        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        long interval = TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS);
-
-        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
-        intent.setAction("STOP");
-        PendingIntent pIntent = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
-
-        /* Stop the alarm at TimePicker time */
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, superPrefs.getInt(KEY_STOP_HOUR, 7));
-        calendar.set(Calendar.MINUTE, superPrefs.getInt(KEY_STOP_MIN, 0));
-
-        /* Stopping everyday */
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                interval, pIntent);
-        Log.d("alarm", "stop");
-
-    }
-
-    public void cancel() {
-
-        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
-        PendingIntent pIntent = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
-
-        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        manager.cancel(pIntent);
-    }
 
     public void rate(View view) {
         Uri uri = Uri.parse("market://details?id=" + getApplicationContext().getPackageName());

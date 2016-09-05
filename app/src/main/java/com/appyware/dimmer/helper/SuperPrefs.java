@@ -17,6 +17,10 @@ public class SuperPrefs implements Constants {
         sharedPreferences = context.getSharedPreferences(TAG_SHARED_PREF, Context.MODE_PRIVATE);
     }
 
+    public static SuperPrefs newInstance(Context context) {
+        return new SuperPrefs(context);
+    }
+
     public void setString(String KEY, String value) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(KEY, value);
