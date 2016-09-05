@@ -30,6 +30,7 @@ import com.appyware.dimmer.helper.SuperPrefs;
 import com.appyware.dimmer.models.ActivityEvent;
 import com.appyware.dimmer.models.ServiceEvent;
 import com.appyware.dimmer.service.ScreenDimmer;
+import com.crashlytics.android.Crashlytics;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -41,6 +42,7 @@ import java.util.Calendar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by
@@ -81,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         init();
