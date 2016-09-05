@@ -1,0 +1,8 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_close">
+
+    <target
+        android:name="@string/cross"
+        android:animation="@animator/cross_tick" />
+
+</animated-vector>

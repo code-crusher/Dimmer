@@ -78,8 +78,8 @@ public class ScreenDimmer extends Service implements Constants {
             }
 
         } else {
-            superPrefs.setBool(KEY_DIM, true);
-            EventBus.getDefault().post(new ServiceEvent(EVENT_SERVICE));
+            //superPrefs.setBool(KEY_DIM, true);
+          //  EventBus.getDefault().post(new ServiceEvent(EVENT_SERVICE));
         }
 
         return START_STICKY;

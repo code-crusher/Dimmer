@@ -2,7 +2,10 @@ package com.appyware.dimmer;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Animatable;
@@ -19,6 +22,7 @@ import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -36,6 +40,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -68,7 +73,12 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
 
     @Subscribe
     public void OnServiceEvent(ServiceEvent event) {
-        setupCheckBoxes();
+        //  setupCheckBoxes();
+        // setupFab(this);
+        if (fabDim != null) {
+            fabDim.setImageResource(R.drawable.anim_cross_tick);
+            animate(fabDim.getRootView());
+        }
     }
 
     @Override
@@ -77,14 +87,14 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         init();
+        setupSeekBar();
+        setupTime();
     }
 
     private void init() {
         superPrefs = new SuperPrefs(this);
         permissionCheck(this);
         setupCheckBoxes();
-        setupTime();
-        setupSeekBar();
         setupFab(this);
     }
 
@@ -161,29 +171,65 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
     private void setupFab(final Activity activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-            fabDim.setImageResource(R.drawable.anim_tick_cross);
+            if (superPrefs.getBool(KEY_DIM).equals(true))
+                fabDim.setImageResource(R.drawable.anim_cross_tick);
+            else
+                fabDim.setImageResource(R.drawable.anim_tick_cross);
+
             fabDim.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    animate(view);
-                    superPrefs.setBoolNot(KEY_DIM);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         if (!PermissionChecker.checkDrawOverlayPermission(activity))
                             permissionCheck(activity);
-                        else
+                        else {
+                            superPrefs.setBoolNot(KEY_DIM);
+                            if (superPrefs.getBool(KEY_DIM).equals(true)) {
+                                fabDim.setImageResource(R.drawable.anim_tick_cross);
+                                startService(new Intent(getApplicationContext(), ScreenDimmer.class));
+                            } else {
+                                //  fabDim.setImageResource(R.drawable.anim_cross_tick);
+                                Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
+                                intent.setAction("STOP");
+                                startService(intent);
+                            }
+                            animate(view);
+                        }
+                    } else {
+                        superPrefs.setBoolNot(KEY_DIM);
+                        if (superPrefs.getBool(KEY_DIM).equals(true)) {
+                            fabDim.setImageResource(R.drawable.anim_tick_cross);
                             startService(new Intent(getApplicationContext(), ScreenDimmer.class));
-                    } else
-                        startService(new Intent(getApplicationContext(), ScreenDimmer.class));
+                        } else {
+                            fabDim.setImageResource(R.drawable.anim_cross_tick);
+                            Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
+                            intent.setAction("STOP");
+                            startService(intent);
+                        }
+                        animate(view);
+                    }
                 }
             });
 
         } else {
-            fabDim.setImageResource(R.drawable.tick);
+            if (superPrefs.getBool(KEY_DIM).equals(true))
+                fabDim.setImageResource(R.drawable.ic_close);
+            else
+                fabDim.setImageResource(R.drawable.tick);
+
             fabDim.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     superPrefs.setBoolNot(KEY_DIM);
-                    startService(new Intent(getApplicationContext(), ScreenDimmer.class));
+                    if (superPrefs.getBool(KEY_DIM).equals(true)) {
+                        fabDim.setImageResource(R.drawable.ic_close);
+                        startService(new Intent(getApplicationContext(), ScreenDimmer.class));
+                    } else {
+                        fabDim.setImageResource(R.drawable.tick);
+                        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
+                        intent.setAction("STOP");
+                        startService(intent);
+                    }
                 }
             });
         }
@@ -199,6 +245,12 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
                 break;
             case R.id.cb_auto:
                 onCheckClick(KEY_AUTO);
+                if (superPrefs.getBool(KEY_AUTO)) {
+                    cancel();
+                    startAlarm();
+                    stopAlarm();
+                } else
+                    cancel();
                 break;
         }
     }
@@ -248,7 +300,63 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
             superPrefs.setInt(KEY_STOP_HOUR, hourOfDay);
             superPrefs.setInt(KEY_STOP_MIN, minute);
         }
+        if (superPrefs.getBool(KEY_AUTO)) {
+            cancel();
+            startAlarm();
+            stopAlarm();
+        }
         setupTime();
+    }
+
+    private void startAlarm() {
+
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        long interval = TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS);
+
+        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
+        PendingIntent pIntent = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
+
+        /* Set the alarm to start at TimePicker time */
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, superPrefs.getInt(KEY_START_HOUR, 22));
+        calendar.set(Calendar.MINUTE, superPrefs.getInt(KEY_START_MIN, 0));
+
+        /* Repeating on everyday */
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                interval, pIntent);
+        Log.d("alarm", "started");
+    }
+
+    private void stopAlarm() {
+
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        long interval = TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS);
+
+        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
+        intent.setAction("STOP");
+        PendingIntent pIntent = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
+
+        /* Stop the alarm at TimePicker time */
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, superPrefs.getInt(KEY_STOP_HOUR, 7));
+        calendar.set(Calendar.MINUTE, superPrefs.getInt(KEY_STOP_MIN, 0));
+
+        /* Stopping everyday */
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                interval, pIntent);
+        Log.d("alarm", "stop");
+
+    }
+
+    public void cancel() {
+
+        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
+        PendingIntent pIntent = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
+
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        manager.cancel(pIntent);
     }
 
     public void rate(View view) {
@@ -269,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
     @Override
     protected void onResume() {
         super.onResume();
-        // init();
+        init();
     }
 
     @Override
