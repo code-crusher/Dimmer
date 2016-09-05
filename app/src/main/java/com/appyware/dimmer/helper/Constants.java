@@ -21,5 +21,7 @@ public interface Constants {
     String KEY_STOP_HOUR = "key_stop_hour";
     String KEY_STOP_MIN = "key_stop_min";
     String KEY_DIM_VALUE = "key_dim_value";
+    String TAG_SELECT_STOP_TIME = "Select stop time";
+    String TAG_SELECT_START_TIME = "Select start time";
 
 }

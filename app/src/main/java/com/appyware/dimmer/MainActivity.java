@@ -29,9 +29,13 @@ import com.appyware.dimmer.helper.SuperPrefs;
 import com.appyware.dimmer.models.ActivityEvent;
 import com.appyware.dimmer.models.ServiceEvent;
 import com.appyware.dimmer.service.ScreenDimmer;
+import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,7 +47,7 @@ import butterknife.OnClick;
  * --21/08/16 at
  * --2:33 PM
  */
-public class MainActivity extends AppCompatActivity implements Constants {
+public class MainActivity extends AppCompatActivity implements Constants, TimePickerDialog.OnTimeSetListener {
 
     @BindView(R.id.seekBar)
     AppCompatSeekBar seekBar;
@@ -60,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements Constants {
     @BindView(R.id.fab_dim)
     FloatingActionButton fabDim;
     private SuperPrefs superPrefs;
+    private TimePickerDialog timePickerDialog;
 
     @Subscribe
     public void OnServiceEvent(ServiceEvent event) {
@@ -209,6 +214,43 @@ public class MainActivity extends AppCompatActivity implements Constants {
         }
     }
 
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
+
+    public void selectStartTime(View view) {
+        startPickerDialog(TAG_SELECT_START_TIME);
+    }
+
+    public void selectStopTime(View view) {
+        startPickerDialog(TAG_SELECT_STOP_TIME);
+    }
+
+    public void startPickerDialog(String tag) {
+        Calendar now = Calendar.getInstance();
+        try {
+            timePickerDialog = TimePickerDialog.newInstance(this, now.get(Calendar.HOUR), now.get(Calendar.MINUTE), true);
+            timePickerDialog.setTitle(tag);
+            timePickerDialog.setAccentColor(getResources().getColor(R.color.colorPrimary));
+            timePickerDialog.show(getFragmentManager(), tag);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int second) {
+
+        if (timePickerDialog.getTag().equals(TAG_SELECT_START_TIME)) {
+            superPrefs.setInt(KEY_START_HOUR, hourOfDay);
+            superPrefs.setInt(KEY_START_MIN, minute);
+        } else if (timePickerDialog.getTag().equals(TAG_SELECT_STOP_TIME)) {
+            superPrefs.setInt(KEY_STOP_HOUR, hourOfDay);
+            superPrefs.setInt(KEY_STOP_MIN, minute);
+        }
+        setupTime();
+    }
+
     public void rate(View view) {
         Uri uri = Uri.parse("market://details?id=" + getApplicationContext().getPackageName());
         Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
@@ -243,7 +285,4 @@ public class MainActivity extends AppCompatActivity implements Constants {
         EventBus.getDefault().unregister(this);
     }
 
-    static {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-    }
 }
