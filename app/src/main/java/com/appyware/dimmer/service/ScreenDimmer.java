@@ -79,7 +79,7 @@ public class ScreenDimmer extends Service implements Constants {
 
         } else {
             //superPrefs.setBool(KEY_DIM, true);
-          //  EventBus.getDefault().post(new ServiceEvent(EVENT_SERVICE));
+            //  EventBus.getDefault().post(new ServiceEvent(EVENT_SERVICE));
         }
 
         return START_STICKY;
@@ -149,15 +149,14 @@ public class ScreenDimmer extends Service implements Constants {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context).setOngoing(true)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.drawable.ic_eye)
                         .setContentTitle("Dimmer running")
-                        .setContentText("Tap to stop!")
+                        .setContentText("Tap to open")
                         .setContentIntent(pIntentActivity)
                         .addAction(R.drawable.ic_pause, "Pause", pIntentPause)
                         .addAction(R.drawable.ic_stop, "Stop", pIntentStop)
                         .addAction(R.drawable.ic_play_arrow, "Start", pIntentStart)
                         .setAutoCancel(true);
-
 
         mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
