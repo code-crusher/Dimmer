@@ -68,15 +68,17 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
     FloatingActionButton fabDim;
     private SuperPrefs superPrefs;
     private TimePickerDialog timePickerDialog;
-    private AlarmHelper alarmHelper;
 
     @Subscribe
     public void OnServiceEvent(ServiceEvent event) {
         //  setupCheckBoxes();
         // setupFab(this);
+
         if (fabDim != null) {
-            fabDim.setImageResource(R.drawable.anim_cross_tick);
-            animate(fabDim.getRootView());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                //     fabDim.setImageResource(R.drawable.anim_cross_tick);
+                //     animate(fabDim.getRootView());
+            }
         }
     }
 
@@ -93,8 +95,6 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
 
     private void init() {
         superPrefs = SuperPrefs.newInstance(this);
-        alarmHelper = new AlarmHelper(this);
-        permissionCheck(this);
         setupCheckBoxes();
         setupFab(this);
     }
@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
                                 fabDim.setImageResource(R.drawable.anim_tick_cross);
                                 startService(new Intent(getApplicationContext(), ScreenDimmer.class));
                             } else {
-                                //  fabDim.setImageResource(R.drawable.anim_cross_tick);
+                                fabDim.setImageResource(R.drawable.anim_cross_tick);
                                 Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
                                 intent.setAction("STOP");
                                 startService(intent);
@@ -246,6 +246,8 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
                 break;
             case R.id.cb_auto:
                 onCheckClick(KEY_AUTO);
+                AlarmHelper alarmHelper;
+                alarmHelper = new AlarmHelper(this);
                 if (superPrefs.getBool(KEY_AUTO)) {
                     alarmHelper.cancel();
                     alarmHelper.startAlarm(superPrefs.getInt(KEY_START_HOUR, 22), superPrefs.getInt(KEY_START_MIN, 0));
@@ -293,7 +295,8 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
 
     @Override
     public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int second) {
-
+        AlarmHelper alarmHelper;
+        alarmHelper = new AlarmHelper(this);
         if (timePickerDialog.getTag().equals(TAG_SELECT_START_TIME)) {
             superPrefs.setInt(KEY_START_HOUR, hourOfDay);
             superPrefs.setInt(KEY_START_MIN, minute);
