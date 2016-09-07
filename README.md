@@ -7,4 +7,4 @@ Dimmer's job is to soothe your dazzled eyes by reducing device brightness in dar
 # Screenshots
 
 ![screenshot](https://lh3.googleusercontent.com/eROfyE2m14zjOcqp27Y72f3Aa8FVUVmxysNj9Z5-BffLB7evJw5vcQKKdlexWFFAy3Q=h900)
-![screenshot](https://lh3.googleusercontent.com/yWMETrHaAOQqDp3szWxYUmZsUF0KcxTkol41FlSz2Dbn0zXcBjlCdawnjcEnx7dXlug=h900)
+![screenshot](https://lh3.googleusercontent.com/CSHfCS4rUGRmLNwKBra-hiBCKVuFt6NV2WAN2cZ6Ooz_sqVBWjIt8UbTNmOI08BQhTpb=h900-rw)
