@@ -1,0 +1,17 @@
+<resources>
+
+    <style name="MyTheme" parent="Theme.AppCompat.NoActionBar">
+
+        <item name="colorPrimary">@color/amber</item>
+        <item name="colorAccent">@color/amber</item>
+        <item name="colorPrimaryDark">@color/amberDark</item>
+
+    </style>
+
+    <style name="MatCheckBox" parent="Material.Drawable.CheckBox">
+
+        <item name="cbd_strokeColor">@color/amber</item>
+
+    </style>
+
+</resources>

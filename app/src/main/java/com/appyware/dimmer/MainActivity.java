@@ -31,6 +31,7 @@ import com.appyware.dimmer.models.ActivityEvent;
 import com.appyware.dimmer.models.ServiceEvent;
 import com.appyware.dimmer.service.ScreenDimmer;
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
+        Fabric.with(this, new Answers());
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         init();

@@ -20,9 +20,12 @@ import com.appyware.dimmer.helper.Constants;
 import com.appyware.dimmer.helper.SuperPrefs;
 import com.appyware.dimmer.models.ActivityEvent;
 import com.appyware.dimmer.models.ServiceEvent;
+import com.crashlytics.android.answers.Answers;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by
@@ -88,7 +91,7 @@ public class ScreenDimmer extends Service implements Constants {
 
     public void onCreate() {
         super.onCreate();
-
+        Fabric.with(this, new Answers());
         superPrefs = new SuperPrefs(getApplicationContext());
 
         // EventBus
