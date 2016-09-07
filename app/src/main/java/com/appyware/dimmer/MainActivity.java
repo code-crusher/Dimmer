@@ -323,6 +323,16 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
         }
     }
 
+    public void openRepo(View view) {
+        Uri uri = Uri.parse("https://github.com/code-crusher/Dimmer");
+        Intent repo = new Intent(Intent.ACTION_VIEW, uri);
+        try {
+            startActivity(repo);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     @SuppressLint("DefaultLocale")
     public String dateFormat(int time) {
         return String.format("%02d", time);
@@ -346,5 +356,4 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
         super.onDestroy();
         EventBus.getDefault().unregister(this);
     }
-
 }

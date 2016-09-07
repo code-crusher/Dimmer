@@ -4,4 +4,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="dist_medium">8dp</dimen>
     <dimen name="dist_big">16dp</dimen>
+    <dimen name="dist_small">4dp</dimen>
 </resources>
