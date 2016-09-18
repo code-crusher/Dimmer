@@ -24,4 +24,9 @@ public interface Constants {
     String TAG_SELECT_STOP_TIME = "Select stop time";
     String TAG_SELECT_START_TIME = "Select start time";
 
+    String TAG_START = "Start";
+    String TAG_PAUSE = "Pause";
+    String TAG_STOP = "Stop";
+    float OPTIMAL_ABMIENT = 80;
+
 }

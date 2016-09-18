@@ -1,22 +1,26 @@
 package com.appyware.dimmer.service;
 
-import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.view.ViewGroup;
+import android.view.SurfaceView;
 import android.view.WindowManager;
 
-import com.appyware.dimmer.MainActivity;
+import com.appyware.dimmer.Activities.AlertDialogActivity;
+import com.appyware.dimmer.Activities.MainActivity;
 import com.appyware.dimmer.R;
 import com.appyware.dimmer.helper.Constants;
+import com.appyware.dimmer.helper.Helper;
 import com.appyware.dimmer.helper.SuperPrefs;
 import com.appyware.dimmer.models.ActivityEvent;
 import com.appyware.dimmer.models.ServiceEvent;
@@ -34,24 +38,31 @@ import io.fabric.sdk.android.Fabric;
  * --2:33 PM
  */
 
-public class ScreenDimmer extends Service implements Constants {
+public class ScreenDimmer extends Service implements Constants, SensorEventListener {
 
-    HUDView mView, mView_bg;
+    SurfaceView mView, mView_bg;
     NotificationManager mNotificationManager;
     SuperPrefs superPrefs;
+
+    // hardware sensor
+    SensorManager sensorManager;
+    Sensor sensor;
 
     @Subscribe
     public void OnActivityEvent(ActivityEvent event) {
         if (mView != null)
-            mView.setBackgroundColor(getColorInt(event.dimValue));
+            mView.setBackgroundColor(Helper.getColorInt(event.dimValue));
         setupNotification();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null && intent.getAction() != null) {
-            if (intent.getAction().equals("STOP")) {
+        setupSensor();
 
+        if (intent != null && intent.getAction() != null) {
+            if (intent.getAction().equals(TAG_STOP)) {
+                if (sensorManager != null)
+                    sensorManager.unregisterListener(this);
                 superPrefs.setBool(KEY_DIM, false);
                 EventBus.getDefault().post(new ServiceEvent(EVENT_SERVICE));
 
@@ -60,20 +71,21 @@ public class ScreenDimmer extends Service implements Constants {
                 }
                 stopService(new Intent(getApplicationContext(), ScreenDimmer.class));
 
-            } else if (intent.getAction().equals("PAUSE")) {
-
+            } else if (intent.getAction().equals(TAG_PAUSE)) {
+                if (sensorManager != null)
+                    sensorManager.unregisterListener(this);
                 if (mView_bg != null) {
                     mView_bg.setBackgroundColor(Color.TRANSPARENT);
                 }
                 if (mView != null)
                     mView.setBackgroundColor(Color.TRANSPARENT);
 
-            } else if (intent.getAction().equals("START")) {
+            } else if (intent.getAction().equals(TAG_START)) {
 
                 int p = superPrefs.getInt(KEY_DIM_VALUE, 0);
 
                 if (mView != null)
-                    mView.setBackgroundColor(getColorInt(p));
+                    mView.setBackgroundColor(Helper.getColorInt(p));
 
                 if (mView_bg != null) {
                     mView_bg.setBackgroundColor(Color.parseColor("#99000000"));
@@ -92,35 +104,49 @@ public class ScreenDimmer extends Service implements Constants {
     public void onCreate() {
         super.onCreate();
         Fabric.with(this, new Answers());
+
+        init();
+    }
+
+    private void init() {
         superPrefs = new SuperPrefs(getApplicationContext());
 
         // EventBus
         if (!EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().register(this);
 
-        mView = new HUDView(this);
-        mView_bg = new HUDView(this);
+        mView = new SurfaceView(this);
+        mView_bg = new SurfaceView(this);
         mView_bg.setBackgroundColor(Color.parseColor("#99000000"));
 
+        // making service view fullscreen
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 PixelFormat.TRANSLUCENT);
-
         params.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
-
         WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         wm.addView(mView_bg, params);
         wm.addView(mView, params);
 
+        setInitialState();
+        setupNotification();
+    }
+
+    private void setupSensor() {
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        sensorManager.registerListener(this, sensor,
+                SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    private void setInitialState() {
         int p = superPrefs.getInt(KEY_DIM_VALUE, 0);
 
         if (mView != null)
-            mView.setBackgroundColor(getColorInt(p));
-
-        setupNotification();
+            mView.setBackgroundColor(Helper.getColorInt(p));
     }
 
     private void setupNotification() {
@@ -139,40 +165,31 @@ public class ScreenDimmer extends Service implements Constants {
         PendingIntent pIntentActivity = PendingIntent.getActivity(context, 0, intentActivity, 0);
 
         Intent intentStop = new Intent(context, ScreenDimmer.class);
-        intentStop.setAction("STOP");
+        intentStop.setAction(TAG_STOP);
         PendingIntent pIntentStop = PendingIntent.getService(context, 0, intentStop, 0);
 
         Intent intentPause = new Intent(context, ScreenDimmer.class);
-        intentPause.setAction("PAUSE");
+        intentPause.setAction(TAG_PAUSE);
         PendingIntent pIntentPause = PendingIntent.getService(context, 0, intentPause, 0);
 
         Intent intentStart = new Intent(context, ScreenDimmer.class);
-        intentStart.setAction("START");
+        intentStart.setAction(TAG_START);
         PendingIntent pIntentStart = PendingIntent.getService(context, 0, intentStart, 0);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context).setOngoing(true)
                         .setSmallIcon(R.drawable.ic_eye)
-                        .setContentTitle("Dimmer running")
-                        .setContentText("Tap to open")
+                        .setContentTitle(getString(R.string.dimmer_running))
+                        .setContentText(getString(R.string.tap_open))
                         .setContentIntent(pIntentActivity)
-                        .addAction(R.drawable.ic_pause, "Pause", pIntentPause)
-                        .addAction(R.drawable.ic_stop, "Stop", pIntentStop)
-                        .addAction(R.drawable.ic_play_arrow, "Start", pIntentStart)
+                        .addAction(R.drawable.ic_pause, TAG_PAUSE, pIntentPause)
+                        .addAction(R.drawable.ic_stop, TAG_STOP, pIntentStop)
+                        .addAction(R.drawable.ic_play_arrow, TAG_START, pIntentStart)
                         .setAutoCancel(true);
 
         mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(2, mBuilder.build());
-    }
-
-    @SuppressLint("DefaultLocale")
-    public String dateFormat(int time) {
-        return String.format("%02d", time);
-    }
-
-    private int getColorInt(int value) {
-        return Color.parseColor("#" + dateFormat(value) + "000000");
     }
 
     @Override
@@ -183,6 +200,8 @@ public class ScreenDimmer extends Service implements Constants {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (sensorManager != null)
+            sensorManager.unregisterListener(this);
         EventBus.getDefault().unregister(this);
         if (mView != null && mView_bg != null) {
             ((WindowManager) getSystemService(WINDOW_SERVICE)).removeView(mView);
@@ -197,22 +216,39 @@ public class ScreenDimmer extends Service implements Constants {
         super.onTaskRemoved(rootIntent);
     }
 
-    class HUDView extends ViewGroup {
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
 
-        public HUDView(Context context) {
-            super(context);
-            setBackgroundColor(Color.parseColor("#10000000"));
+        float x = sensorEvent.values[0];
+        if (x > OPTIMAL_ABMIENT) {
+            pauseServiceIntent();
+            AlertDialogActivity.startActivity(this);
         }
+    }
 
-        @Override
-        protected void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
 
-        }
+    }
 
-        @Override
-        protected void onLayout(boolean arg0, int arg1, int arg2, int arg3, int arg4) {
-        }
+    /**
+     * service helper methods
+     */
+    private void pauseServiceIntent() {
+        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
+        intent.setAction(TAG_PAUSE);
+        startService(intent);
+    }
 
+    private void stopServiceIntent() {
+        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
+        intent.setAction(TAG_STOP);
+        startService(intent);
+    }
+
+    private void startServiceIntent() {
+        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
+        intent.setAction(TAG_START);
+        startService(intent);
     }
 }

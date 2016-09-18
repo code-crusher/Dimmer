@@ -1,4 +1,4 @@
-package com.appyware.dimmer;
+package com.appyware.dimmer.Activities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.appyware.dimmer.R;
 import com.appyware.dimmer.helper.AlarmHelper;
 import com.appyware.dimmer.helper.Constants;
 import com.appyware.dimmer.helper.PermissionChecker;
@@ -193,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
                             } else {
                                 fabDim.setImageResource(R.drawable.anim_cross_tick);
                                 Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
-                                intent.setAction("STOP");
+                                intent.setAction(TAG_STOP);
                                 startService(intent);
                             }
                             animate(view);
@@ -205,9 +206,7 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
                             startService(new Intent(getApplicationContext(), ScreenDimmer.class));
                         } else {
                             fabDim.setImageResource(R.drawable.anim_cross_tick);
-                            Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
-                            intent.setAction("STOP");
-                            startService(intent);
+                            stopServiceIntent();
                         }
                         animate(view);
                     }
@@ -229,9 +228,7 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
                         startService(new Intent(getApplicationContext(), ScreenDimmer.class));
                     } else {
                         fabDim.setImageResource(R.drawable.tick);
-                        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
-                        intent.setAction("STOP");
-                        startService(intent);
+                        stopServiceIntent();
                     }
                 }
             });
@@ -314,6 +311,11 @@ public class MainActivity extends AppCompatActivity implements Constants, TimePi
         setupTime();
     }
 
+    private void stopServiceIntent() {
+        Intent intent = new Intent(getApplicationContext(), ScreenDimmer.class);
+        intent.setAction(TAG_STOP);
+        startService(intent);
+    }
 
     public void rate(View view) {
         Uri uri = Uri.parse("market://details?id=" + getApplicationContext().getPackageName());

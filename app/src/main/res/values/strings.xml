@@ -17,5 +17,7 @@
     <string name="_07_00">07:00</string>
     <string name="edit_end_time">edit end time</string>
     <string name="edit_start_time">edit start time</string>
+    <string name="dimmer_running">Dimmer running</string>
+    <string name="tap_open">Tap to open</string>
 
 </resources>
