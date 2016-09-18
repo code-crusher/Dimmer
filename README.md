@@ -1,10 +1,10 @@
 # Dimmer - Eyes Protector
-Dimmer's job is to soothe your dazzled eyes by reducing device brightness in dark.
+Dimmer's job is to soothe your dazzled eyes by reducing device brightness lower than the minimum in dark.
 
 # Download
-[Google Play](https://play.google.com/store/apps/details?id=com.appyware.dimmer)
+<a href='https://play.google.com/store/apps/details?id=com.appyware.dimmer&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' width="161" height="62"/></a>
 
 # Screenshots
 
-![screenshot](https://lh3.googleusercontent.com/eROfyE2m14zjOcqp27Y72f3Aa8FVUVmxysNj9Z5-BffLB7evJw5vcQKKdlexWFFAy3Q=h900)
-![screenshot](https://lh3.googleusercontent.com/yWMETrHaAOQqDp3szWxYUmZsUF0KcxTkol41FlSz2Dbn0zXcBjlCdawnjcEnx7dXlug=h900)
+<a><img alt='' src='https://lh3.googleusercontent.com/eROfyE2m14zjOcqp27Y72f3Aa8FVUVmxysNj9Z5-BffLB7evJw5vcQKKdlexWFFAy3Q=h900' width="587" height="657"/></a>
+<a><img alt='' src='https://lh3.googleusercontent.com/CSHfCS4rUGRmLNwKBra-hiBCKVuFt6NV2WAN2cZ6Ooz_sqVBWjIt8UbTNmOI08BQhTpb=h900-rw' width="587" height="657"/></a>
