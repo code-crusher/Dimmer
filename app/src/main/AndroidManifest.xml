@@ -41,6 +41,6 @@
         </receiver>
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="93dcfa4afd71ea856365e5f282fa950726c9f8bb" />
+            android:value="YOUR_FABRIC_KEY" />
     </application>
 </manifest>
