@@ -1,5 +1,8 @@
 # Dimmer - Eyes Protector
-Dimmer's job is to soothe your dazzled eyes by reducing device brightness lower than the minimum in dark.
+Dimmer's job is to soothe your dazzled eyes by providing a blue light filter on the device screen in the dark.
+
+# Research
+http://www.bluelightexposed.com/#bluelightexposed
 
 # Download
 <a href='https://play.google.com/store/apps/details?id=com.appyware.dimmer&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' width="161" height="62"/></a>
