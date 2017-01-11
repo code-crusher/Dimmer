@@ -1,4 +1,4 @@
-package com.appyware.dimmer.Activities;
+package com.appyware.dimmer.activities;
 
 import android.content.Context;
 import android.content.DialogInterface;

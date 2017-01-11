@@ -16,8 +16,8 @@ import android.support.v4.app.NotificationCompat;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
-import com.appyware.dimmer.Activities.AlertDialogActivity;
-import com.appyware.dimmer.Activities.MainActivity;
+import com.appyware.dimmer.activities.AlertDialogActivity;
+import com.appyware.dimmer.activities.MainActivity;
 import com.appyware.dimmer.R;
 import com.appyware.dimmer.helper.Constants;
 import com.appyware.dimmer.helper.Helper;
@@ -88,7 +88,7 @@ public class ScreenDimmer extends Service implements Constants, SensorEventListe
                     mView.setBackgroundColor(Helper.getColorInt(p));
 
                 if (mView_bg != null) {
-                    mView_bg.setBackgroundColor(Color.parseColor("#99000000"));
+                    mView_bg.setBackgroundColor(this.getResources().getColor(R.color.overlay_color));
                 }
             }
 
@@ -117,7 +117,7 @@ public class ScreenDimmer extends Service implements Constants, SensorEventListe
 
         mView = new SurfaceView(this);
         mView_bg = new SurfaceView(this);
-        mView_bg.setBackgroundColor(Color.parseColor("#99000000"));
+        mView_bg.setBackgroundColor(this.getResources().getColor(R.color.overlay_color));
 
         // making service view fullscreen
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(

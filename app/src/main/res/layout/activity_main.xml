@@ -252,6 +252,6 @@
         ads:backgroundTint="@color/colorPrimary"
         ads:layout_anchor="@id/cv_main"
         ads:layout_anchorGravity="center_horizontal|bottom"
-        tools:context=".Activities.MainActivity" />
+        tools:context=".activities.MainActivity" />
 
 </android.support.design.widget.CoordinatorLayout>

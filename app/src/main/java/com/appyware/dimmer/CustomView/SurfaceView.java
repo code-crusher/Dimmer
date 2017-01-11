@@ -1,9 +1,10 @@
-package com.appyware.dimmer.CustomView;
+package com.appyware.dimmer.customView;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.view.ViewGroup;
+
+import com.appyware.dimmer.R;
 
 /**
  * Created by
@@ -17,7 +18,7 @@ class SurfaceView extends ViewGroup {
 
     public SurfaceView(Context context) {
         super(context);
-        setBackgroundColor(Color.parseColor("#10000000"));
+        setBackgroundColor(context.getResources().getColor(R.color.overlay_color));
     }
 
     @Override

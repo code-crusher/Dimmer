@@ -6,15 +6,15 @@ repositories {
 apply plugin: 'android-apt'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.0"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         applicationId "com.appyware.dimmer"
         minSdkVersion 14
-        targetSdkVersion 24
-        versionCode 9
-        versionName "2.0.1b"
+        targetSdkVersion 25
+        versionCode 12
+        versionName "2.1"
 
         vectorDrawables.useSupportLibrary = true
     }
